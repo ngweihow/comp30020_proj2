@@ -128,25 +128,22 @@ same_elem([X,X|Xs]):-
  *takes the list output of check_diagonal2 and validates all the elements using same_elem
  */
 check_diagonal1([]).
-check_diagonal1([R|Rs]):-
-	%Finding the length of the solvable part of the puzzle
-	length(R, L),
-	Len is 	L - 1,
+check_diagonal1([_|Rs]):-
 	%Check if all the diagonals are the same
-	check_diagonal2(Rs,1,Len,Dlist),
-	same_elem(Dlist).
+	check_diagonal2(Rs,1,[]).
 
 
 /*check_diagonal2 function to check if all the diagonal elements are the same
  *iterates through the rows recursively to handle puzzles of any size
  *outputs a the diagonals of the puzzle as a list
  */
-check_diagonal2([], _, _, _).
-check_diagonal2([R|Rs], Iter, Len, Diag):-
+check_diagonal2([], _, _).
+check_diagonal2([R|Rs], Iter, Diag):-
 	nth0(Iter,R,Elem),
 	append([Elem], Diag, Diag1),
 	Iter1 #= Iter + 1,
-	check_diagonal2(Rs, Iter1, Len, Diag1).
+	check_diagonal2(Rs, Iter1, Diag1),
+	same_elem(Diag1).
 
 %-------------------------------------------------------------------------------------------------
 /*puzzle_solution function that would be given the input of the puzzle as a list of lists
@@ -161,8 +158,8 @@ puzzle_solution(Rows):-
 	%Tranpose the puzzle matrix so that the columns becomes the rows
 	transpose(Rows, Columns),
 	%map solve_puzzle and all_different to every column
-	solve_puzzle(Columns),
+	solve_puzzle(Columns).
 
-
+	%use contrivance label to flatten the array
 	append(Rows,Solution),
-	label(Solution).
+	label(Solution). 
