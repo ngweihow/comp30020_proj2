@@ -27,16 +27,16 @@ check_diagonal([[_,_,_,_,_,_],[_,V,_,_,_,_],[_,_,V,_,_,_],[_,_,_,V,_,_],[_,_,_,_
 */
 
 %-------------------------------------------------------------------------------------------------
-/*sum_list function which takes a list and an Header Value
+/*add_list function which takes a list and an Header Value
  *it checks if the sum of all values in the list equates to the value of the Header
  */
 %base case
-sum_list([], 0).
+%add_list([], _).
+add_list([X],X).
 %recursive case
-sum_list([X|Xs], Header):-
-	sum_list(Xs, Tail),
-	Header is X + Tail.
-
+add_list([X1,X2|Xs], Sum):-
+	Xp #= X1+X2,
+	add_list([Xp|Xs], Sum).
 %-------------------------------------------------------------------------------------------------
 /*product_list function which takes a list and a Header Value
  *it checks if the product of all values in the list equates to the value of the Header
@@ -45,10 +45,14 @@ sum_list([X|Xs], Header):-
 product_list([X], X).
 %recursive case --- Xp represent the product sum 
 product_list([X1,X2|Xs], Header):-
-	Xp is X1*X2,
+	Xp #= X1*X2,
 	product_list([Xp|Xs],Header).
 	
 %-------------------------------------------------------------------------------------------------
+
+in_range0([]).
+in_range0([_|Ys]):- 
+	in_range(Ys).
 /*in_range function which takes the argument of a list of elements either row/column 
  *it checks if the values in the list are in between the range of 1-9 inclusive
  */
@@ -74,10 +78,11 @@ solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
 /*solve_puzzle function to solve the puzzle as either rows or the transpose (columns)
  *maps the all_different function and the check_rows function onto each row/column
  */
-solve_puzzle([]).
-solve_puzzle([R|Rs]):-
+%solve_puzzle([]).
+solve_puzzle([_|Rs]):-
 	%map solve_puzzle and all_different to every row,
-	maplist(all_different, Rs),
+	%maplist(all_different, Rs),
+	maplist(in_range0,Rs),
 	maplist(check_rowsN, Rs).
 
 
@@ -90,14 +95,15 @@ check_rows([]).
 check_rows([R|Rs]):-
 	check_rowsN(R),
 	check_rows(Rs).
-
+*/
 /*check_rowsN function to check whether each row is valid
  *calls the sum_list, product_list and in-range predicates
  */
-check_rowsN([]).
+%check_rowsN([]).
 check_rowsN([X|Xs]):-
-	in_range(Xs),
-	sum_list(Xs, X);
+	all_different(Xs),
+	%in_range(Xs),
+	add_list(Xs, X);
 	product_list(Xs, X).
 
 
@@ -105,7 +111,7 @@ check_rowsN([X|Xs]):-
 /*same_elem function to check if all the elements of the list are the same
  *helper function to help check if all the diagonals in a function are the same 
  */
-same_elem([]).
+%same_elem([]).
 %if the last element remaining, it is true regardless of what it is
 same_elem([_]).
 %Otherwise always check if the first two elements are the same and recurse 
@@ -118,7 +124,7 @@ same_elem([X,X|Xs]):-
  *gets the length of the puzzle and call the check_diagonal2 function to actually check each row
  *takes the list output of check_diagonal2 and validates all the elements using same_elem
  */
-check_diagonal1([]).
+%check_diagonal1([]).
 check_diagonal1([R|Rs]):-
 	%Finding the length of the solvable part of the puzzle
 	length(R, L),
@@ -144,7 +150,6 @@ check_diagonal2([R|Rs], Iter, Len, Diag):-
  *this function checks the validity of the puzzle with each condition
  *once all the conditions are satisfied the puzzle_solution would return the valid answer for the puzzle
  */
-puzzle_solution([]).
 puzzle_solution(Rows):-
 	%check that the puzzle is a square
 	%maplist(same_lengths(Rows), Rows),
@@ -153,6 +158,8 @@ puzzle_solution(Rows):-
 	%Tranpose the puzzle matrix so that the columns becomes the rows
 	transpose(Rows, Columns),
 	%map solve_puzzle and all_different to every column
-	solve_puzzle(Columns).
+	solve_puzzle(Columns),
 
 
+	append(Rows,Solution),
+	label(Solution).
