@@ -49,10 +49,10 @@ product_list([X1,X2|Xs], Header):-
 	product_list([Xp|Xs],Header).
 	
 %-------------------------------------------------------------------------------------------------
-
-in_range0([]).
+/*
+%in_range0([]).
 in_range0([_|Ys]):- 
-	in_range(Ys).
+	in_range(Ys).*/
 /*in_range function which takes the argument of a list of elements either row/column 
  *it checks if the values in the list are in between the range of 1-9 inclusive
  */
@@ -82,7 +82,7 @@ solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
 solve_puzzle([_|Rs]):-
 	%map solve_puzzle and all_different to every row,
 	%maplist(all_different, Rs),
-	maplist(in_range0,Rs),
+	%maplist(in_range,Rs),
 	maplist(check_rowsN, Rs).
 
 
@@ -102,7 +102,7 @@ check_rows([R|Rs]):-
 %check_rowsN([]).
 check_rowsN([X|Xs]):-
 	all_different(Xs),
-	%in_range(Xs),
+	in_range(Xs),
 	add_list(Xs, X);
 	product_list(Xs, X).
 
