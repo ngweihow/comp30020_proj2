@@ -16,17 +16,6 @@
 :- use_module(library(clpfd)).
 
 %-------------------------------------------------------------------------------------------------
-/*check_diagonal function to check if the diagonal values are all valid and the same
- *the function uses pattern matching and the unique function from the ***** library 
- */
- /*
-check_diagonal([[_,_,_],[_,X,_],[_,_,X]]).
-check_diagonal([[_,_,_,_],[_,Y,_,_],[_,_,Y,_],[_,_,_,Y]]).
-check_diagonal([[_,_,_,_,_],[_,Z,_,_,_],[_,_,Z,_,_],[_,_,_,Z,_],[_,_,_,_,Z]]).
-check_diagonal([[_,_,_,_,_,_],[_,V,_,_,_,_],[_,_,V,_,_,_],[_,_,_,V,_,_],[_,_,_,_,V,_],[_,_,_,_,_,V]]).
-*/
-
-%-------------------------------------------------------------------------------------------------
 /*add_list function which takes a list and an Header Value
  *it checks if the sum of all values in the list equates to the value of the Header
  */
@@ -48,70 +37,39 @@ product_list([X|Xs], Header):-
 	Header #= Product*X.
 	
 %-------------------------------------------------------------------------------------------------
+/*Distinct number check and range 1-9 inclusive check functions
+ *-----------------------------------------------------------------
+ */
 
+%range_check predicate to remove the first row of headers which need not be checked
 range_check([_|Ws]):-
-maplist(in_range0,Ws).
-%in_range0([]).
+	maplist(in_range0,Ws).
+%in_range0 predicate to remove the first element header which need not be checked 
 in_range0([_|Ys]):- 
 	in_range(Ys).
 /*in_range function which takes the argument of a list of elements either row/column 
  *it checks if the values in the list are in between the range of 1-9 inclusive
  */
-%% in_range([X|Xs]):-
-%% 	between(1, 9, X),
-%% 	in_range(Xs).
-
 in_range([]).
-in_range(Row) :-
+in_range(Row):-
 	all_distinct(Row),
 	Row ins 1..9.
 
-
-%-------------------------------------------------------------------------------------------------
-/*
-solve_puzzle3([]).
-solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
-	check_diagonal([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]),
-	in_range([B2,B3]),
-	in_range([C2,C3]),
-	sum_list([B2,B3],B1); num_list([B2,B3],B1),
-	sum_list([C2,C3],C1); num_list([C2,C3],C1),
-	sum_list([B2,C2],A2); num_list([B2,C2],A2),
-	sum_list([B3,C3],A3); num_list([B3,C3],A3).
-*/
-
 %-------------------------------------------------------------------------------------------------
 /*solve_puzzle function to solve the puzzle as either rows or the transpose (columns)
- *maps the all_different function and the check_rows function onto each row/column
+ *maps the all_different function and the check_rows function onto each row/column, skipping the header
  */
-%solve_puzzle([]).
 solve_puzzle([_|Rs]):-
-	%map solve_puzzle and all_different to every row,
-	%maplist(all_different, Rs),
-	%maplist(in_range0,Rs),
 	maplist(check_rowsN, Rs).
 
-
 %-------------------------------------------------------------------------------------------------
-/*check_rows function which takes all the rows and recursively checks each and every one of them
- *calls the check_rowsN function to check all of them
- */
- /*
-check_rows([]).
-check_rows([R|Rs]):-
-	check_rowsN(R),
-	check_rows(Rs).
-*/
 /*check_rowsN function to check whether each row is valid
  *calls the sum_list, product_list and in-range predicates
  */
 %check_rowsN([]).
 check_rowsN([X|Xs]):-
-	%in_range(Xs),
-	%all_distinct(Xs),
 	add_list(Xs, X);
 	product_list(Xs, X).
-
 
 %-------------------------------------------------------------------------------------------------
 /*same_elem function to check if all the elements of the list are the same
@@ -125,14 +83,17 @@ same_elem([X,X|Xs]):-
 	same_elem([X|Xs]).
 
 %-------------------------------------------------------------------------------------------------
-%Functions to check that the diagonals of the puzzle are the same
+/*Same Diagonal checking functions
+ *---------------------------------
+ */
+
 /*check_diagonal1 function to make sure the first row is eliminated from the rest of the puzzle
  *gets the length of the puzzle and call the check_diagonal2 function to actually check each row
  *takes the list output of check_diagonal2 and validates all the elements using same_elem
  */
 check_diagonal1([]).
 check_diagonal1([_|Rs]):-
-	%Check if all the diagonals are the same
+	%Check if all the diagonals are the same and pass in the iterator of 1 to skip first element
 	check_diagonal2(Rs,1,[]).
 
 
@@ -142,30 +103,37 @@ check_diagonal1([_|Rs]):-
  */
 check_diagonal2([], _, _).
 check_diagonal2([R|Rs], Iter, Diag):-
+	%get the element at the index of the iterator
 	nth0(Iter,R,Elem),
+	%add the element into the diag list to be checked later
 	append([Elem], Diag, Diag1),
 	Iter1 #= Iter + 1,
+	%recursively call itself till the diag list is fully constructed and then check if its the same
 	check_diagonal2(Rs, Iter1, Diag1),
 	same_elem(Diag1).
 
 %-------------------------------------------------------------------------------------------------
+%			Puzzle Solution
+%------------------------------------------------
 /*puzzle_solution function that would be given the input of the puzzle as a list of lists
  *this function checks the validity of the puzzle with each condition
  *once all the conditions are satisfied the puzzle_solution would return the valid answer for the puzzle
  */
 puzzle_solution(Rows):-
-	%check that the puzzle is a square
-	%maplist(same_lengths(Rows), Rows),
-	range_check(Rows),
+	%check for the diagonals 
 	check_diagonal1(Rows),
+
+	%check and solve for the restraints for rows
+	range_check(Rows),
 	solve_puzzle(Rows),
+
 	%Tranpose the puzzle matrix so that the columns becomes the rows
 	transpose(Rows, Columns),
+
+	%check and solve for the restraints for columns
 	range_check(Columns),
-	%map solve_puzzle and all_different to every column
 	solve_puzzle(Columns),
+
 	%use contrivance label to flatten the array
 	append(Rows,Solution),
-	range_check(Columns),
-
 	label(Solution). 
