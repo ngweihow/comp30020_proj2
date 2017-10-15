@@ -78,13 +78,14 @@ solve_puzzle([]).
 solve_puzzle([R|Rs]):-
 	%map solve_puzzle and all_different to every row,
 	maplist(all_different, Rs),
-	maplist(check_rows, Rs).
+	maplist(check_rowsN, Rs).
 
 
 %-------------------------------------------------------------------------------------------------
 /*check_rows function which takes all the rows and recursively checks each and every one of them
  *calls the check_rowsN function to check all of them
  */
+ /*
 check_rows([]).
 check_rows([R|Rs]):-
 	check_rowsN(R),
