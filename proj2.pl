@@ -49,6 +49,8 @@ product_list([X|Xs], Header):-
 	
 %-------------------------------------------------------------------------------------------------
 
+range_check([_|Ws]):-
+maplist(in_range0,Ws).
 %in_range0([]).
 in_range0([_|Ys]):- 
 	in_range(Ys).
@@ -61,6 +63,7 @@ in_range0([_|Ys]):-
 
 in_range([]).
 in_range(Row) :-
+	all_distinct(Row),
 	Row ins 1..9.
 
 
@@ -85,7 +88,7 @@ solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
 solve_puzzle([_|Rs]):-
 	%map solve_puzzle and all_different to every row,
 	%maplist(all_different, Rs),
-	maplist(in_range0,Rs),
+	%maplist(in_range0,Rs),
 	maplist(check_rowsN, Rs).
 
 
@@ -105,7 +108,7 @@ check_rows([R|Rs]):-
 %check_rowsN([]).
 check_rowsN([X|Xs]):-
 	%in_range(Xs),
-	all_distinct(Xs),
+	%all_distinct(Xs),
 	add_list(Xs, X);
 	product_list(Xs, X).
 
@@ -153,13 +156,16 @@ check_diagonal2([R|Rs], Iter, Diag):-
 puzzle_solution(Rows):-
 	%check that the puzzle is a square
 	%maplist(same_lengths(Rows), Rows),
+	range_check(Rows),
 	check_diagonal1(Rows),
 	solve_puzzle(Rows),
 	%Tranpose the puzzle matrix so that the columns becomes the rows
 	transpose(Rows, Columns),
+	range_check(Columns),
 	%map solve_puzzle and all_different to every column
-	solve_puzzle(Columns).
-
+	solve_puzzle(Columns),
 	%use contrivance label to flatten the array
 	append(Rows,Solution),
+	range_check(Columns),
+
 	label(Solution). 
