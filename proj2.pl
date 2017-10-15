@@ -19,12 +19,12 @@
 /*check_diagonal function to check if the diagonal values are all valid and the same
  *the function uses pattern matching and the unique function from the ***** library 
  */
-check_diagonal([[_,_],[_,_]]).
+ /*
 check_diagonal([[_,_,_],[_,X,_],[_,_,X]]).
 check_diagonal([[_,_,_,_],[_,Y,_,_],[_,_,Y,_],[_,_,_,Y]).
 check_diagonal([[_,_,_,_,_],[_,Z,_,_,_],[_,_,Z,_,_],[_,_,_,Z,_],[_,_,_,_,Z]]).
 check_diagonal([[_,_,_,_,_,_],[_,V,_,_,_,_],[_,_,V,_,_,_],[_,_,_,V,_,_],[_,_,_,_,V,_],[_,_,_,_,_,V]]).
-	
+*/
 
 %-------------------------------------------------------------------------------------------------
 /*sum_list function which takes a list and an Header Value
@@ -58,6 +58,7 @@ in_range([X|Xs]):-
 	in_range(Xs).
 
 %-------------------------------------------------------------------------------------------------
+/*
 solve_puzzle3([]).
 solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
 	check_diagonal([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]),
@@ -67,7 +68,7 @@ solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
 	sum_list([C2,C3],C1); num_list([C2,C3],C1),
 	sum_list([B2,C2],A2); num_list([B2,C2],A2),
 	sum_list([B3,C3],A3); num_list([B3,C3],A3).
-
+*/
 
 %-------------------------------------------------------------------------------------------------
 solve_puzzle([]).
@@ -106,10 +107,13 @@ same_elem([X,X|Xs]):-
 	same_elem([X|Xs]).
 
 %-------------------------------------------------------------------------------------------------
+/*check_diagonal function to check if all the diagonal elements are the same
+ *iterates through the rows recursively to handle puzzles of any size
+ */
 check_diagonal2([], 0, _, []).
 check_diagonal2([R|Rs], Iter, Len, Diag):-
 	nth0(Iter,R,Elem),
-	append([Elem], Diag, Diag1)
+	append([Elem], Diag, Diag1),
 	Iter1 is Iter + 1,
 	check_diagonal2(Rs, Iter1, Len, Diag1).
 
@@ -121,7 +125,7 @@ check_diagonal2([R|Rs], Iter, Len, Diag):-
 puzzle_solution([]).
 puzzle_solution(Rows):-
 	%check that the puzzle is a square
-	maplist(same_lengths(Rows), Rows),
+	%maplist(same_lengths(Rows), Rows),
 	%map the solve_puzzle to every row
 	maplist(solve_puzzle, Rows),
 	%Tranpose the puzzle matrix so that the columns becomes the rows
