@@ -71,14 +71,10 @@ solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
 */
 
 %-------------------------------------------------------------------------------------------------
+
 solve_puzzle([]).
 solve_puzzle([R|Rs]):-
-	%Finding the length of the solvable part of the puzzle
-	length(Rs, L),
-	Len is L - 1,
-	%Check if all the diagonals are the same
-	check_diagonal2(Rs,0,Len,Dlist),
-	same_elem(Dlist),
+	
 	%Check if all the rows satisfy the conditions of either a sum or product
 	check_rows([R|Rs]).
 
@@ -107,11 +103,28 @@ same_elem([X,X|Xs]):-
 	same_elem([X|Xs]).
 
 %-------------------------------------------------------------------------------------------------
-/*check_diagonal function to check if all the diagonal elements are the same
+%Functions to check that the diagonals of the puzzle are the same
+/*check_diagonal1 function to make sure the first row is eliminated from the rest of the puzzle
+ *gets the length of the puzzle and call the check_diagonal2 function to actually check each row
+ *takes the list output of check_diagonal2 and validates all the elements using same_elem
+ */
+check_diagonal1([]).
+check_diagonal1([R|Rs]):-
+	%Finding the length of the solvable part of the puzzle
+	length(R, L),
+	Len is 	L - 1,
+	%Check if all the diagonals are the same
+	check_diagonal2(Rs,1,Len,Dlist),
+	same_elem(Dlist).
+
+
+/*check_diagonal2 function to check if all the diagonal elements are the same
  *iterates through the rows recursively to handle puzzles of any size
+ *outputs a the diagonals of the puzzle as a list
  */
 check_diagonal2([], 0, _, []).
 check_diagonal2([R|Rs], Iter, Len, Diag):-
+	Iter =< Len,
 	nth0(Iter,R,Elem),
 	append([Elem], Diag, Diag1),
 	Iter1 is Iter + 1,
@@ -126,10 +139,11 @@ puzzle_solution([]).
 puzzle_solution(Rows):-
 	%check that the puzzle is a square
 	%maplist(same_lengths(Rows), Rows),
+	%check_diagonal1(Rows),
 	%map the solve_puzzle to every row
-	maplist(solve_puzzle, Rows),
+	maplist(check_rows, Rows),
 	%Tranpose the puzzle matrix so that the columns becomes the rows
 	transpose(Rows, Columns),
-	maplist(solve_puzzle, Columns).
+	maplist(check_rows, Columns).
 
 
