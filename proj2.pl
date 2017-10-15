@@ -71,22 +71,31 @@ solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
 */
 
 %-------------------------------------------------------------------------------------------------
-
+/*solve_puzzle function to solve the puzzle as either rows or the transpose (columns)
+ *maps the all_different function and the check_rows function onto each row/column
+ */
 solve_puzzle([]).
 solve_puzzle([R|Rs]):-
-	
-	%Check if all the rows satisfy the conditions of either a sum or product
-	check_rows([R|Rs]).
+	%map solve_puzzle and all_different to every row,
+	maplist(all_different, Rs),
+	maplist(check_rows, Rs).
 
 
 %-------------------------------------------------------------------------------------------------
+/*check_rows function which takes all the rows and recursively checks each and every one of them
+ *calls the check_rowsN function to check all of them
+ */
 check_rows([]).
 check_rows([R|Rs]):-
 	check_rowsN(R),
 	check_rows(Rs).
 
+/*check_rowsN function to check whether each row is valid
+ *calls the sum_list, product_list and in-range predicates
+ */
 check_rowsN([]).
 check_rowsN([X|Xs]):-
+	in_range(Xs),
 	sum_list(Xs, X);
 	product_list(Xs, X).
 
@@ -122,9 +131,8 @@ check_diagonal1([R|Rs]):-
  *iterates through the rows recursively to handle puzzles of any size
  *outputs a the diagonals of the puzzle as a list
  */
-check_diagonal2([], 0, _, []).
+check_diagonal2([], _, _, _).
 check_diagonal2([R|Rs], Iter, Len, Diag):-
-	Iter =< Len,
 	nth0(Iter,R,Elem),
 	append([Elem], Diag, Diag1),
 	Iter1 is Iter + 1,
@@ -139,11 +147,11 @@ puzzle_solution([]).
 puzzle_solution(Rows):-
 	%check that the puzzle is a square
 	%maplist(same_lengths(Rows), Rows),
-	%check_diagonal1(Rows),
-	%map the solve_puzzle to every row
-	maplist(check_rows, Rows),
+	check_diagonal1(Rows),
+	solve_puzzle(Rows),
 	%Tranpose the puzzle matrix so that the columns becomes the rows
 	transpose(Rows, Columns),
-	maplist(check_rows, Columns).
+	%map solve_puzzle and all_different to every column
+	solve_puzzle(Columns).
 
 
