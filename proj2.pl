@@ -21,7 +21,7 @@
  */
  /*
 check_diagonal([[_,_,_],[_,X,_],[_,_,X]]).
-check_diagonal([[_,_,_,_],[_,Y,_,_],[_,_,Y,_],[_,_,_,Y]).
+check_diagonal([[_,_,_,_],[_,Y,_,_],[_,_,Y,_],[_,_,_,Y]]).
 check_diagonal([[_,_,_,_,_],[_,Z,_,_,_],[_,_,Z,_,_],[_,_,_,Z,_],[_,_,_,_,Z]]).
 check_diagonal([[_,_,_,_,_,_],[_,V,_,_,_,_],[_,_,V,_,_,_],[_,_,_,V,_,_],[_,_,_,_,V,_],[_,_,_,_,_,V]]).
 */
@@ -31,35 +31,38 @@ check_diagonal([[_,_,_,_,_,_],[_,V,_,_,_,_],[_,_,V,_,_,_],[_,_,_,V,_,_],[_,_,_,_
  *it checks if the sum of all values in the list equates to the value of the Header
  */
 %base case
-%add_list([], _).
-add_list([X],X).
+add_list([], 0).
 %recursive case
-add_list([X1,X2|Xs], Sum):-
-	Xp #= X1+X2,
-	add_list([Xp|Xs], Sum).
+add_list([X|Xs], Header):-
+	add_list(Xs, Tail),
+	Header #= X + Tail.
 %-------------------------------------------------------------------------------------------------
 /*product_list function which takes a list and a Header Value
  *it checks if the product of all values in the list equates to the value of the Header
  */
 %base case
-product_list([X], X).
+product_list([],1).
 %recursive case --- Xp represent the product sum 
-product_list([X1,X2|Xs], Header):-
-	Xp #= X1*X2,
-	product_list([Xp|Xs],Header).
+product_list([X|Xs], Header):-
+	product_list(Xs,Product),
+	Header #= Product*X.
 	
 %-------------------------------------------------------------------------------------------------
-/*
+
 %in_range0([]).
 in_range0([_|Ys]):- 
-	in_range(Ys).*/
+	in_range(Ys).
 /*in_range function which takes the argument of a list of elements either row/column 
  *it checks if the values in the list are in between the range of 1-9 inclusive
  */
+%% in_range([X|Xs]):-
+%% 	between(1, 9, X),
+%% 	in_range(Xs).
+
 in_range([]).
-in_range([X|Xs]):-
-	between(1, 9, X),
-	in_range(Xs).
+in_range(Row) :-
+	Row ins 1..9.
+
 
 %-------------------------------------------------------------------------------------------------
 /*
@@ -82,7 +85,7 @@ solve_puzzle3([[A1,A2,A3],[B1,B2,B3],[C1,C2,C3]]):-
 solve_puzzle([_|Rs]):-
 	%map solve_puzzle and all_different to every row,
 	%maplist(all_different, Rs),
-	%maplist(in_range,Rs),
+	maplist(in_range0,Rs),
 	maplist(check_rowsN, Rs).
 
 
@@ -101,8 +104,8 @@ check_rows([R|Rs]):-
  */
 %check_rowsN([]).
 check_rowsN([X|Xs]):-
-	all_different(Xs),
-	in_range(Xs),
+	%in_range(Xs),
+	all_distinct(Xs),
 	add_list(Xs, X);
 	product_list(Xs, X).
 
@@ -111,7 +114,7 @@ check_rowsN([X|Xs]):-
 /*same_elem function to check if all the elements of the list are the same
  *helper function to help check if all the diagonals in a function are the same 
  */
-%same_elem([]).
+same_elem([]).
 %if the last element remaining, it is true regardless of what it is
 same_elem([_]).
 %Otherwise always check if the first two elements are the same and recurse 
@@ -124,7 +127,7 @@ same_elem([X,X|Xs]):-
  *gets the length of the puzzle and call the check_diagonal2 function to actually check each row
  *takes the list output of check_diagonal2 and validates all the elements using same_elem
  */
-%check_diagonal1([]).
+check_diagonal1([]).
 check_diagonal1([R|Rs]):-
 	%Finding the length of the solvable part of the puzzle
 	length(R, L),
@@ -142,7 +145,7 @@ check_diagonal2([], _, _, _).
 check_diagonal2([R|Rs], Iter, Len, Diag):-
 	nth0(Iter,R,Elem),
 	append([Elem], Diag, Diag1),
-	Iter1 is Iter + 1,
+	Iter1 #= Iter + 1,
 	check_diagonal2(Rs, Iter1, Len, Diag1).
 
 %-------------------------------------------------------------------------------------------------
