@@ -19,12 +19,12 @@
 /*check_diagonal function to check if the diagonal values are all valid and the same
  *the function uses pattern matching and the unique function from the ***** library 
  */
- /*
-check_diagonal([[_,_,_],[_,X,_],[_,_,X]]).
-check_diagonal([[_,_,_,_],[_,Y,_,_],[_,_,Y,_],[_,_,_,Y]]).
-check_diagonal([[_,_,_,_,_],[_,Z,_,_,_],[_,_,Z,_,_],[_,_,_,Z,_],[_,_,_,_,Z]]).
-check_diagonal([[_,_,_,_,_,_],[_,V,_,_,_,_],[_,_,V,_,_,_],[_,_,_,V,_,_],[_,_,_,_,V,_],[_,_,_,_,_,V]]).
-*/
+ 
+check_diagonal1([[_,_,_],[_,X,_],[_,_,X]]).
+check_diagonal1([[_,_,_,_],[_,Y,_,_],[_,_,Y,_],[_,_,_,Y]]).
+check_diagonal1([[_,_,_,_,_],[_,Z,_,_,_],[_,_,Z,_,_],[_,_,_,Z,_],[_,_,_,_,Z]]).
+check_diagonal1([[_,_,_,_,_,_],[_,V,_,_,_,_],[_,_,V,_,_,_],[_,_,_,V,_,_],[_,_,_,_,V,_],[_,_,_,_,_,V]]).
+
 
 %-------------------------------------------------------------------------------------------------
 /*add_list function which takes a list and an Header Value
@@ -118,8 +118,9 @@ same_elem([]).
 %if the last element remaining, it is true regardless of what it is
 same_elem([_]).
 %Otherwise always check if the first two elements are the same and recurse 
-same_elem([X,X|Xs]):-
-	same_elem([X|Xs]).
+same_elem([X1,X2|Xs]):-
+	X1 #= X2,
+	same_elem([X2|Xs]).
 
 %-------------------------------------------------------------------------------------------------
 %Functions to check that the diagonals of the puzzle are the same
@@ -127,6 +128,7 @@ same_elem([X,X|Xs]):-
  *gets the length of the puzzle and call the check_diagonal2 function to actually check each row
  *takes the list output of check_diagonal2 and validates all the elements using same_elem
  */
+ /*
 check_diagonal1([]).
 check_diagonal1([R|Rs]):-
 	%Finding the length of the solvable part of the puzzle
@@ -135,18 +137,20 @@ check_diagonal1([R|Rs]):-
 	%Check if all the diagonals are the same
 	check_diagonal2(Rs,1,Len,Dlist),
 	same_elem(Dlist).
-
+*/
 
 /*check_diagonal2 function to check if all the diagonal elements are the same
  *iterates through the rows recursively to handle puzzles of any size
  *outputs a the diagonals of the puzzle as a list
  */
+ /*
 check_diagonal2([], _, _, _).
 check_diagonal2([R|Rs], Iter, Len, Diag):-
 	nth0(Iter,R,Elem),
 	append([Elem], Diag, Diag1),
 	Iter1 #= Iter + 1,
 	check_diagonal2(Rs, Iter1, Len, Diag1).
+	*/
 
 %-------------------------------------------------------------------------------------------------
 /*puzzle_solution function that would be given the input of the puzzle as a list of lists
